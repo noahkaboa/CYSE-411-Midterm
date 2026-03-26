@@ -21,9 +21,17 @@ let currentFilter = "all";
 
 
 function loadDashboardState() {
-    const raw   = localStorage.getItem("dashboardState");
-    const state = JSON.parse(raw);             // No try/catch
-    currentFilter = state.filter;              // No enum validation
+    const raw = localStorage.getItem("dashboardState");
+    let state;
+    try {
+        state = JSON.parse(raw);           
+    } catch(e) {
+        state = {filter: "all"};
+    }
+
+    if (!ACCEPTED_FILTERS.includes(state.filter)) state.filter = "all";
+
+    currentFilter = state.filter;              
     applyFilter(currentFilter);
 }
 
@@ -37,7 +45,12 @@ function loadDashboardState() {
 
 function saveDashboardState() {
     const filterInput = document.getElementById("filter-select");
-    const filter      = filterInput.value;    // Not validated before storing
+    let filter;
+    if (!ACCEPTED_FILTERS.includes(filterInput.value)) {
+        filter = "all";
+    } else {
+        filter      = filterInput.value;
+    }
     localStorage.setItem("dashboardState", JSON.stringify({ filter: filter }));
     currentFilter = filter;
 }
@@ -103,7 +116,7 @@ function renderIncidents(incidents) {
             item.appendChild(sev)
             container.appendChild(item);
         } else {
-            console.log("Skipping. Unaccepted title or severity: " + incident.title + ": " + incident.severity);
+            console.log("Skipping. Unaccepted title or severity: '" + incident.title + "': '" + incident.severity + "'");
         }
         
         
