@@ -55,9 +55,17 @@ function saveDashboardState() {
 
 
 async function fetchIncidents() {
-    const res  = fetch("/api/incidents");      // Missing await
-    const data = res.json();                   // Missing await; res is a Promise
-    return data;
+    try {
+
+        const res  = await fetch("/api/incidents");      // Missing await
+        if (!res.ok) throw new Error("HTTP error: " + res.status);
+        const data = await res.json();                   // Missing await; res is a Promise
+        return data;
+    } catch (e) {
+        console.log("Error within fetchIncidents:")
+        console.log(e)
+        return []
+    }
 }
 
 
