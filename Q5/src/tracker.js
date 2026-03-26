@@ -83,14 +83,30 @@ function renderIncidents(incidents) {
     const container = document.getElementById("incident-list");
     container.innerHTML = "";                  // Clear previous results
 
+    if (!Array.isArray(incidents)) {
+        container.textContent = "Error! Render was not passed an array of incidents"
+        return;
+    }
+
+
     incidents.forEach(function (incident) {
-        const item = document.createElement("li");
-        // UNSAFE – directly inserts API response as HTML
-        item.innerHTML =
-            "<strong>" + incident.title + "</strong>" +
-            " <span class='severity severity-" + incident.severity + "'>" +
-            incident.severity + "</span>";
-        container.appendChild(item);
+
+        if (ACCEPTED_SEVERITIES.includes(incident.severity) && incident.title !== "") {
+            const item = document.createElement("li");
+            const title = document.createElement("strong");
+            title.textContent = incident.title;
+            
+            const sev = document.createElement("span");
+            sev.classList = "severity severity-" + incident.severity;
+            sev.textContent = incident.severity;
+            item.appendChild(title)
+            item.appendChild(sev)
+            container.appendChild(item);
+        } else {
+            console.log("Skipping. Unaccepted title or severity: " + incident.title + ": " + incident.severity);
+        }
+        
+        
     });
 }
 
